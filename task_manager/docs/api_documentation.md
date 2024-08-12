@@ -1,13 +1,35 @@
 # Task Management API
 
 ## General Description
-The Task Management API allows users to manage tasks by creating, reading, updating, and deleting tasks. Each task has attributes such as ID, title, description, due date, and status. This API provides endpoints for performing CRUD operations on tasks.
+
+The Task Management API allows users to manage tasks by creating, reading, updating, and deleting tasks. Each task has attributes such as ID, title, description, due date, and status.
 
 ### Base URL
 
 [http://localhost:8080](http://localhost:8080)
 
+## Instructions
+
+### Seting up MongoDB
+
+**1. Install MongoDB**
+
+- Follow the instructions on MongoDB website to install MongoDB - [MongoDB installation guide](https://www.mongodb.com/docs/manual/installation/)
+
+**2. Start MongoDB Server**
+
+- Start mongodb server using `mongod` command
+
+**3. Install Project Dependencies**
+
+- Install Project dependencies using command:
+
+```sh
+go get .
+```
+
 ## Project Structure
+
 ```sh
     task_manager/
     ├── main.go
@@ -35,6 +57,7 @@ The Task Management API allows users to manage tasks by creating, reading, updat
 ## Endpoints
 
 ### 1. Get All Tasks
+
 **URL:** `/tasks`  
 **Method:** `GET`  
 **Description:** Retrieves a list of all tasks.  
@@ -42,110 +65,128 @@ The Task Management API allows users to manage tasks by creating, reading, updat
 No parameters.
 
 **Response:**
+
 - **Status:** 200 OK
 - **Body:**
+
 ```json
 [
-    {
-        "id": "1",
-        "title": "Task 1",
-        "description": "Description of Task 1",
-        "due_date": "2024-08-10T12:00:00Z",
-        "status": "pending"
-    },
-    {
-        "id": "2",
-        "title": "Task 2",
-        "description": "Description of Task 2",
-        "due_date": "2024-08-11T12:00:00Z",
-        "status": "completed"
-    }
+  {
+    "id": "66b488a18f682f0c1fc9cd35",
+    "title": "Task 1",
+    "description": "description for task1",
+    "due_date": "2024-08-08T07:23:10Z",
+    "status": "pending"
+  },
+  {
+    "id": "66b4ac6403193664f9a0f721",
+    "title": "Task 2",
+    "description": "description for task2",
+    "due_date": "2024-09-14T07:23:10Z",
+    "status": "done"
+  }
 ]
 ```
 
 ### 2. Get a Task by ID
+
 **URL:** `/tasks/:id`  
 **Method:** `GET`  
-**Description:**  Retrieves a task by its ID.
-**Request:** 
+**Description:** Retrieves a task by its ID.
+**Request:**
+
 - **Parameters:** `id (string)` - The ID of the task.
 
 **Response:**
+
 - **Status:** 200 OK
 - **Body:**
+
 ```json
-{
-    "id": "1",
-    "title": "Task 1",
-    "description": "Description of Task 1",
-    "due_date": "2024-08-10T12:00:00Z",
-    "status": "pending"
-}
+ {
+        "id": "66b488a18f682f0c1fc9cd35",
+        "title": "Task 1",
+        "description": "description for task1",
+        "due_date": "2024-08-08T07:23:10Z",
+        "status": "pending"
+},
 ```
+
 ### 3. Create a New Task
+
 **URL:** `/tasks/`  
 **Method:** `POST`  
-**Description:**  Creates a new task.
-**Request:** 
+**Description:** Creates a new task.
+**Request:**
+
 - **Body:**
+
 ```json
 {
-    "title": "New Task",
-    "description": "Description of the new task",
-    "due_date": "2024-08-10T12:00:00Z",
-    "status": "pending"
+  "title": "Task1 ",
+  "description": "description for task1",
+  "due_date": "2024-08-08T07:23:10Z",
+  "status": "pending"
 }
 ```
+
 **Response:**
+
 - **Status:** 201 Created
 - **Body:**
+
 ```json
 {
-    "id": "3",
-    "title": "New Task",
-    "description": "Description of the new task",
-    "due_date": "2024-08-10T12:00:00Z",
-    "status": "pending"
+  "id": "66b488a18f682f0c1fc9cd35",
+  "title": "Task 1",
+  "description": "description for task1",
+  "due_date": "2024-08-10T12:00:00Z",
+  "status": "pending"
 }
 ```
+
 ### 4. Update a Task
+
 **URL:** `/tasks/:id`  
 **Method:** `PUT`  
-**Description:**  Updates an existing task.
-**Request:** 
+**Description:** Updates an existing task.
+**Request:**
+
 - **Parameters:**
-    - `id (string)` - The ID of the task.
+  - `id (string)` - The ID of the task.
 - **Body:**
+
 ```json
 {
-    "title": "Updated Task",
-    "description": "Updated description",
-    "due_date": "2024-08-12T12:00:00Z",
-    "status": "completed"
+  "title": "Updated Task",
+  "description": "Updated description",
+  "due_date": "2024-08-12T12:00:00Z",
+  "status": "completed"
 }
-
 ```
+
 **Response:**
+
 - **Status:** 200 OK
 - **Body:**
+
 ```json
 {
-    "id": "1",
-    "title": "Updated Task",
-    "description": "Updated description",
-    "due_date": "2024-08-12T12:00:00Z",
-    "status": "completed"
+  "id": "66b488a18f682f0c1fc9cd35",
+  "title": "Updated Task",
+  "description": "Updated description",
+  "due_date": "2024-08-12T12:00:00Z",
+  "status": "completed"
 }
 ```
 
 ### 5. Delete a Task
+
 **URL:** `/tasks/:id`  
 **Method:** `DELETE`  
-**Description:**  Deletes a task by its ID.
-**Request:** 
-- **Parameters:**
-    - `id (string)` - The ID of the task.
-**Response:**
-- **Status:** 204 No Content
+**Description:** Deletes a task by its ID.
+**Request:**
 
-Link to Postman [API Documentation](https://documenter.getpostman.com/view/25805253/2sA3rzKCtU) 
+- **Parameters:** - `id (string)` - The ID of the task.
+  **Response:**
+- **Status:** 204 No Content

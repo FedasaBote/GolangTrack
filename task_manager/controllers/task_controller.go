@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"task_manager/data"
 	"task_manager/models"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +26,7 @@ func (ts *TaskController) AddTask(c *gin.Context) {
 		return
 	}
 
-	err := ts.taskService.AddTask(task);
+	_, err := ts.taskService.AddTask(task)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -35,7 +36,14 @@ func (ts *TaskController) AddTask(c *gin.Context) {
 }
 
 func (ts *TaskController) GetAllTasks(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, ts.taskService.GetAllTasks())
+	tasks, err := ts.taskService.GetAllTasks()
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "No Task Found!"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, tasks)
 }
 
 func (ts *TaskController) GetTask(c *gin.Context) {

@@ -1,84 +1,100 @@
 package data
 
 import (
+	"context"
 	"errors"
 	"task_manager/models"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 
 type TaskService struct {
-	tasks []models.Task
+	collection *mongo.Collection
 }
 
-func NewTaskService() *TaskService {
+func NewTaskService(collection *mongo.Collection) *TaskService {
 	return &TaskService{
-		tasks: make([]models.Task, 0),
+		collection: collection,
 	}
 }
 
-func (ts *TaskService) AddTask(task models.Task) (err error) {
+func (ts *TaskService) AddTask(task models.Task) (models.Task,error) {
 	if task.DueDate.Before(time.Now()) {
-		return errors.New("due date can't be in the past")
+		return models.Task{},errors.New("due date can't be in the past")
 	}
 
-	for _,otherTask := range ts.tasks {
-		if otherTask.ID == task.ID {
-			return errors.New("task with the given Id already exists")
-		}
-	}
+	insertResult, err := ts.collection.InsertOne(context.Background(), task)
 
-	ts.tasks = append(ts.tasks, task)
-	return nil
+	if err != nil {
+		return models.Task{}, err
+	}
+	
+	task.ID = insertResult.InsertedID.(primitive.ObjectID)
+	return task, nil
 }
 
-func (ts *TaskService) GetAllTasks() []models.Task {
-	return ts.tasks
+func (ts *TaskService) GetAllTasks() ([]models.Task,error) {
+	
+	cursor, err := ts.collection.Find(context.Background(), bson.M{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var tasks []models.Task
+	if err = cursor.All(context.Background(), &tasks); err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
 }
 
 func (ts *TaskService) GetTask(id string) (task models.Task, err error){
 	
-	for _, task := range ts.tasks {
-		if task.ID == id {
-			return task, nil
-		}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return models.Task{}, errors.New("invalid id")
 	}
 
-	return models.Task{}, errors.New("task not found");
+	err = ts.collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&task)
+	if err != nil {
+		return models.Task{}, errors.New("task not found")
+	}
+
+	return task, nil
 
 }
 
 func (ts *TaskService) UpdateTask(id string, updatedTask models.Task) (err error) {
 
-	for i, task := range ts.tasks {
-		if task.ID == id {
-			if updatedTask.Description != ""  {
-				task.Description = updatedTask.Description
-			}
-
-			if updatedTask.DueDate.After(time.Now()){
-				task.DueDate = updatedTask.DueDate
-			}
-			
-			if updatedTask.Status != "" {
-				task.Status = updatedTask.Status
-			}
-			ts.tasks[i] = task
-		return nil
-		}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid id")
 	}
 
-	return errors.New("task not found")
+	_, err = ts.collection.UpdateOne(context.Background(), bson.M{"_id": objectID}, bson.M{"$set": updatedTask})
+	if err != nil {
+		return errors.New("task not found")
+	}
+
+	return nil
 }
 
 func (ts *TaskService) DeleteTask(id string) (err error) {
 
-	for i, task := range ts.tasks {
-		if task.ID == id {
-			ts.tasks = append(ts.tasks[:i], ts.tasks[i + 1:]...)
-			return nil
-		}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid id")
 	}
 
-	return errors.New("task not found")
+	_, err = ts.collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+	if err != nil {
+		return errors.New("task not found")
+	}
+
+	return nil
 }

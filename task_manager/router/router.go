@@ -3,12 +3,12 @@ package router
 import (
 	"task_manager/controllers"
 	"task_manager/data"
+
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(taskService data.TaskService) *gin.Engine {
 	r := gin.Default()
-	taskService := *data.NewTaskService()
 	taskController := *controllers.NewTaskController(taskService)
 
 	r.GET("/tasks", taskController.GetAllTasks)
