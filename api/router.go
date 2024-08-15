@@ -14,7 +14,8 @@ import (
 
 
 
-func SetupRouter(timeout time.Duration, db *mongo.Database, gin *gin.Engine) {
+func Router(db *mongo.Database, gin *gin.Engine) {
+	timeout := time.Duration(5) * time.Second
 	tr := infrastructure.NewTaskRepository(db, models.CollectionTask)
 	ur := infrastructure.NewUserRepository(db, models.CollectionUser)
 	userctr := &controllers.UserController{

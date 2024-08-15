@@ -4,7 +4,6 @@ import (
 	"clean_architecture/api"
 	"context"
 	"log"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,10 +18,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var timeout = time.Duration(5) * time.Second
 	r := gin.Default()
 
-	api.SetupRouter(timeout, db, r)
+	api.Router( db, r)
 
 	r.Run(":8080")
 
